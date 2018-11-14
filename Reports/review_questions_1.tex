@@ -1,0 +1,56 @@
+\documentclass[a4paper]{article}
+
+\usepackage{fullpage} % Package to use full page
+\usepackage{parskip} % Package to tweak paragraph skipping
+\usepackage{tikz} % Package for drawing
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+
+\title{Scalable Machine Learning - Review Questions 1}
+\author{TheBrightSideOfLife: Giorgio Ruffa - Erik Wouters}
+\date{09/11/2018}
+
+\begin{document}
+
+\maketitle
+
+\section{Normal Equation}
+\begin{itemize}
+    \item \textbf{a) True} Normal equation is an analitycal approach that does not require a learning phase, hence no learning rate
+    \item \textbf{b) True} The complexity goes with $n^3$ where $n$ is the number of features
+    \item \textbf{c) True} As said for answer \textbf{a}, no learning hence no iteration
+\end{itemize}
+
+\section{Mean Square Error}
+$$SE=\sum_{i}^{m} (\hat{y}^{(i)} - y^{(i)}) = (-0.2)^2 + (0.4)^2 + (-0.8)^2 + (1.3)^2 + (-0.7)^2 = 3.02$$ 
+$$MSE=\frac{\sum_{i}^{m} (\hat{y}^{(i)} - y^{(i)})}{M} = \frac{3.02}{5} = 0.604$$
+
+\section{Overfitting}
+Correct answers are \textbf{a} and \textbf{d}.
+
+Supposing a fixed number of coefficients, if you have less observation than coefficient it will be very easy to overfit the data. On the other hand if the observation are much more then the coefficients, the model might be to simple and hardly overfits the data.
+
+\section{Simple Linear Regression}
+You need two coefficient, the slope and the intercept.
+$$\hat{y} = w_1 x + w_0$$
+
+\section{Ridge Regression}
+The correct answer is \textbf{c}: \textit{"In case of very large $\lambda$; bias is high, variance is low"}.
+
+Let's think of a very extreme case. If $\lambda$ is very large the regularization term of the loss function will have an important contribution. 
+$$ J(\mathbf{w}) = MSE(\mathbf{w}) + \lambda \sum_{i=1}^{n} w_{i}^2
+$$
+In order to minimize the cost function, all the weights would have to be very small, hence the final model will be close to a straight horizontal line:
+$$
+    \hat{y}^{(i)} = w_0 + w_1 x_1^{(i)} + ... + w_n x_n^{(i)} \simeq w_0
+$$
+
+By its definition the variance is defined as:
+$$
+{\displaystyle {\begin{aligned}\operatorname {Var} {\big [}{\hat {f}}(x){\big ]}=\operatorname {E} [{\hat {f}}(x)^{2}]-{\Big (}\operatorname {E} [{\hat {f}}(x)]{\Big )}^{2}\end{aligned}}}
+$$
+But in this particular case $\operatorname {E} [{\hat {f}}(x)^{2}] \simeq {\Big (}\operatorname {E} [{\hat {f}}(x)]{\Big )}^{2}$, hence $\operatorname {Var} {\big [}{\hat {f}}(x){\big ]} \simeq  0$
+
+On the other hand bias will be very high and we will be effectively in an underfitting situation.
+\end{document}
