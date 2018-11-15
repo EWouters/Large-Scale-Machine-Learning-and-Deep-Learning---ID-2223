@@ -1,0 +1,9 @@
+# Download container:
+sudo docker pull jupyter/all-spark-notebook
+sudo docker pull jupyter/tensorflow-notebook
+
+# Create container:
+sudo docker run -it --name jupyter-spark -p 8888:8888 --mount src="${HOME}/GitHub/Large-Scale-Machine-Learning-and-Deep-Learning---ID-2223",target="/home/jovyan/work",type=bind jupyter/all-spark-notebook
+
+# Start container:
+sudo docker start jupyter-spark
