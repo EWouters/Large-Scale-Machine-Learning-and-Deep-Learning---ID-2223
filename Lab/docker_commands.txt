@@ -7,3 +7,6 @@ sudo docker run -it --name jupyter-spark -p 8888:8888 --mount src="${HOME}/GitHu
 
 # Start container:
 sudo docker start jupyter-spark
+
+# Get terminal in container:
+sudo docker exec -it jupyter-spark /bin/bash
