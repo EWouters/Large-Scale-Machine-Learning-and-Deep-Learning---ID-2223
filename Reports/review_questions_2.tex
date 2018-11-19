@@ -21,27 +21,48 @@
 
 Cross validation in machine learning is the technique of taking a part of the training data, removing it from the training data before training and using it after training to evaluate the performance of a model.
 
-There are multiple types of cross validation. The holdout method is as described above. The results of this method can vary, depending on the particular selection of the training and validation sets. To reduce this dependency, $k$-fold cross validation can be used. In this case the training data is divided in $k$ subsets and the holdout method is repeated $k$ times, each subset $k$ serves as the validation data exactly once. When we increase $k$ to the number of samples in the training set $n$ we get leave-one-out cross validation.
+There are multiple types of cross validation. The holdout method is as described above. The results of this method can vary, depending on the particular selection of the training and validation sets. To reduce this dependency, $k$-fold cross validation can be used. In this case the training data is divided in $k$ subsets and the holdout method is repeated $k$ times, each subset $k$ serves as the validation data exactly once. When we increase $k$ to the number of samples in the training set $m$ we get leave-one-out cross validation.
 
 %/url{https://www.cs.cmu.edu/~schneide/tut5/node42.html}
 
 \section{Softmax}
-The softmax function is defined as
+The sigmoid function used in binary logistic regression is defined as following:
+\begin{align*}
+    P(\hat{y}=0 | \mathbf{w}^{T}, \mathbf{x}) &= \frac{e^{-\mathbf{w}^T \mathbf{x}}}{1 + e^{-\mathbf{w}^T \mathbf{x}}} 
+    \\
+    P(\hat{y}=1 | \mathbf{w}^{T}, \mathbf{x}) &= 1 - P(\hat{y}=0 | \mathbf{w}^{T}, \mathbf{x}) = \frac{1}{1 + e^{-\mathbf{w}^T \mathbf{x}}} 
+\end{align*}
+
+While the softmax function is defined as
 \begin{align}
-\sigma(\mathbf{w}^T_j\mathbf{x}) &= \frac{e^{\mathbf{w}^T_j\mathbf{x}}}{\sum^k_{i=1}e^{\mathbf{w}^T_i\mathbf{x}}}
+\sigma(\mathbf{w}^T_j\mathbf{x}) &= 
+P(\hat{y} = j | \mathbf{x}, \mathbf{w}_j) =
+\frac{e^{\mathbf{w}^T_j\mathbf{x}}}{\sum^k_{i=1}e^{\mathbf{w}^T_i\mathbf{x}}}
 \end{align}
 where
 \begin{align}
 \mathbf{w}^T_i &= [w_{0,i},w_{1,i},\dots,w_{n,i}]
 \end{align}
-with $n$ the number of input features.
+with $n$ the number of input features; and
+\begin{align*}
+    j \in \{1, ... ,k\}
+\end{align*}
+which is an index representing each separate, and mutually exclusive, class while $k$ is a finite integer.
+
+Note that for the softmax function we have that the sum of the probability outcomes for each class $j \in \{1,...,k\}$ is equal to one
+\begin{align} \label{eq:normalization}
+    \sum_{j=i}^{k} P(y=j | \mathbf{x}, \mathbf{w_j}) =
+    \frac{\sum^k_{j=1}e^{\mathbf{w}^T_j\mathbf{x}}}{\sum^k_{i=1}e^{\mathbf{w}^T_i\mathbf{x}}} =
+    1
+\end{align}
+
 When we have two classes ($k = 2$) we get
 \begin{align*}
 \sigma(\mathbf{w}^T_j\mathbf{x}) &= \frac{e^{\mathbf{w}^T_j\mathbf{x}}}{\sum^2_{i=1}e^{\mathbf{w}^T_i\mathbf{x}}} \\
 &= \frac{e^{\mathbf{w}^T_j\mathbf{x}}}{e^{\mathbf{w}^T_1\mathbf{x}} + e^{\mathbf{w}^T_2\mathbf{x}}} \\
 \end{align*}
 
-Then $j = 1$ ???
+For $j = 1$
 
 \begin{align*}
 \sigma(\mathbf{w}^T_1\mathbf{x}) &= \frac{e^{\mathbf{w}^T_1\mathbf{x}}}{e^{\mathbf{w}^T_1\mathbf{x}} + e^{\mathbf{w}^T_2\mathbf{x}}} \\
@@ -50,37 +71,46 @@ Then $j = 1$ ???
 We can now take divide the numerator and denominator by $e^{\mathbf{w}^T_1\mathbf{x}}$ and we get
 
 \begin{align*}
-\sigma(\mathbf{w}^T_1\mathbf{x}) &= \frac{1}{1 + e^{(\mathbf{w}^T_2-\mathbf{w}^T_1)\mathbf{x}}} \\
+\sigma(\mathbf{w}^T_1\mathbf{x}) = \frac{1}{1 + e^{(\mathbf{w}^T_2-\mathbf{w}^T_1)\mathbf{x}}} 
+= \frac{1}{1 + e^{- (\mathbf{w}^T_1-\mathbf{w}^T_2)\mathbf{x}}}
 \end{align*}
 
+We can calculate $\sigma(\mathbf{w}^T_2\mathbf{x})$ using the normalization condition of equation \ref{eq:normalization}:
+
+\begin{align*}
+\sigma(\mathbf{w}^T_2\mathbf{x}) = 1 - P(\hat{y} = 1 | \mathbf{x},\mathbf{w}_1) = 1 - \sigma(\mathbf{w}^T_1\mathbf{x}) = 1 - \frac{1}{1 + e^{- (\mathbf{w}^T_1-\mathbf{w}^T_2)\mathbf{x}}} = \frac{e^{- (\mathbf{w}^T_1-\mathbf{w}^T_2)\mathbf{x}}}{1 + e^{- (\mathbf{w}^T_1-\mathbf{w}^T_2)\mathbf{x}}}
+\end{align*}
+If we define $\mathbf{w} = \mathbf{w_1} - \mathbf{w_2}$ we obtain the same form of the sigmoid function, hence the equivalence.
+
+Less formally, we can say that the equivalence of the two forms builds upon the fact that the classes are mutually exclusive, which implies that the sum of the probabilities of an observation to a class must be equal to one.
 
 
 
+% \url{https://stats.stackexchange.com/questions/237893/should-k-2-softmax-regression-and-logistic-regression-give-the-same-results}
+% Let $Y \in \{0,1\}$ be the outcome variable and let $X$ denote a single predictor. Without the bias term, the softmax functions can be written as:
 
-\url{https://stats.stackexchange.com/questions/237893/should-k-2-softmax-regression-and-logistic-regression-give-the-same-results}
-Let $Y \in \{0,1\}$ be the outcome variable and let $X$ denote a single predictor. Without the bias term, the softmax functions can be written as:
+% $P(Y=0|X=x) = \dfrac{e^{x\beta_0}}{e^{x \beta_0}+e^{x\beta_1}} = \dfrac{1}{1+e^{x(\beta_1-\beta_0)}}$
 
-$P(Y=0|X=x) = \dfrac{e^{x\beta_0}}{e^{x \beta_0}+e^{x\beta_1}} = \dfrac{1}{1+e^{x(\beta_1-\beta_0)}}$
+% $P(Y=1|X=x) = \dfrac{e^{x\beta_1}}{e^{x \beta_0}+e^{x\beta_1}} = \dfrac{e^{x(\beta_1-\beta_0)}}{1+e^{x(\beta_1-\beta_0)}}$
 
-$P(Y=1|X=x) = \dfrac{e^{x\beta_1}}{e^{x \beta_0}+e^{x\beta_1}} = \dfrac{e^{x(\beta_1-\beta_0)}}{1+e^{x(\beta_1-\beta_0)}}$
-
-Hence, the probabilities only depend on the difference $\beta_1 - \beta_0$. Choosing $\beta_0=8$ and $\beta_1=10$, for example, will give you the same value of the logistic loss function as $\beta_0=108$ and $\beta_1=110$. Both parameters are therefore not individually identifiable.
+% Hence, the probabilities only depend on the difference $\beta_1 - \beta_0$. Choosing $\beta_0=8$ and $\beta_1=10$, for example, will give you the same value of the logistic loss function as $\beta_0=108$ and $\beta_1=110$. Both parameters are therefore not individually identifiable.
 
 
-\url{https://stats.stackexchange.com/questions/233658/softmax-vs-sigmoid-function-in-logistic-classifier}
-In the two-class logistic regression, the predicted probablies are as follows, using the sigmoid function:
+% \url{https://stats.stackexchange.com/questions/233658/softmax-vs-sigmoid-function-in-logistic-classifier}
+% In the two-class logistic regression, the predicted probablies are as follows, using the sigmoid function:
 
-\begin{align} \Pr(Y_i=0) &= \frac{e^{-\boldsymbol\beta_ \cdot \mathbf{X}_i}} {1 +e^{-\boldsymbol\beta_0 \cdot \mathbf{X}_i}} \, \\ \Pr(Y_i=1) &= 1 - \Pr(Y_i=0) = \frac{1} {1 +e^{-\boldsymbol\beta_ \cdot \mathbf{X}_i}} \end{align}
+% \begin{align} \Pr(Y_i=0) &= \frac{e^{-\boldsymbol\beta_ \cdot \mathbf{X}_i}} {1 +e^{-\boldsymbol\beta_0 \cdot \mathbf{X}_i}} \, \\ \Pr(Y_i=1) &= 1 - \Pr(Y_i=0) = \frac{1} {1 +e^{-\boldsymbol\beta_ \cdot \mathbf{X}_i}} \end{align}
 
-In the multiclass logistic regression, with $K$ classes, the predicted probabilities are as follows, using the softmax function:
+% In the multiclass logistic regression, with $K$ classes, the predicted probabilities are as follows, using the softmax function:
 
-\begin{align} \Pr(Y_i=k) &= \frac{e^{\boldsymbol\beta_k \cdot \mathbf{X}_i}} {~\sum_{0 \leq c \leq K}^{}{e^{\boldsymbol\beta_c \cdot \mathbf{X}_i}}} \, \\ \end{align}
+% \begin{align} \Pr(Y_i=k) &= \frac{e^{\boldsymbol\beta_k \cdot \mathbf{X}_i}} {~\sum_{0 \leq c \leq K}^{}{e^{\boldsymbol\beta_c \cdot \mathbf{X}_i}}} \, \\ \end{align}
 
-One can observe that the softmax function is an extension of the sigmoid function to the multiclass case, as explained below. Let's look at the multiclass logistic regression, with $K=2$ classes:
+% One can observe that the softmax function is an extension of the sigmoid function to the multiclass case, as explained below. Let's look at the multiclass logistic regression, with $K=2$ classes:
 
-\begin{align} \Pr(Y_i=0) &= \frac{e^{\boldsymbol\beta_0 \cdot \mathbf{X}_i}} {~\sum_{0 \leq c \leq K}^{}{e^{\boldsymbol\beta_c \cdot \mathbf{X}_i}}} = \frac{e^{\boldsymbol\beta_0 \cdot \mathbf{X}_i}}{e^{\boldsymbol\beta_0 \cdot \mathbf{X}_i} + e^{\boldsymbol\beta_1 \cdot \mathbf{X}_i}} = \frac{e^{(\boldsymbol\beta_0 - \boldsymbol\beta_1) \cdot \mathbf{X}_i}}{e^{(\boldsymbol\beta_0 - \boldsymbol\beta_1) \cdot \mathbf{X}_i} + 1} = \frac{e^{-\boldsymbol\beta_ \cdot \mathbf{X}_i}} {1 +e^{-\boldsymbol\beta \cdot \mathbf{X}_i}} \\ \, \\ \Pr(Y_i=1) &= \frac{e^{\boldsymbol\beta_1 \cdot \mathbf{X}_i}} {~\sum_{0 \leq c \leq K}^{}{e^{\boldsymbol\beta_c \cdot \mathbf{X}_i}}} = \frac{e^{\boldsymbol\beta_1 \cdot \mathbf{X}_i}}{e^{\boldsymbol\beta_0 \cdot \mathbf{X}_i} + e^{\boldsymbol\beta_1 \cdot \mathbf{X}_i}} = \frac{1}{e^{(\boldsymbol\beta_0-\boldsymbol\beta_1) \cdot \mathbf{X}_i} + 1} = \frac{1} {1 +e^{-\boldsymbol\beta_ \cdot \mathbf{X}_i}} \, \\ \end{align}
+% \begin{align} \Pr(Y_i=0) &= \frac{e^{\boldsymbol\beta_0 \cdot \mathbf{X}_i}} {~\sum_{0 \leq c \leq K}^{}{e^{\boldsymbol\beta_c \cdot \mathbf{X}_i}}} = \frac{e^{\boldsymbol\beta_0 \cdot \mathbf{X}_i}}{e^{\boldsymbol\beta_0 \cdot \mathbf{X}_i} + e^{\boldsymbol\beta_1 \cdot \mathbf{X}_i}} = \frac{e^{(\boldsymbol\beta_0 - \boldsymbol\beta_1) \cdot \mathbf{X}_i}}{e^{(\boldsymbol\beta_0 - \boldsymbol\beta_1) \cdot \mathbf{X}_i} + 1} = \frac{e^{-\boldsymbol\beta_ \cdot \mathbf{X}_i}} {1 +e^{-\boldsymbol\beta \cdot \mathbf{X}_i}} \\ \, \\ \Pr(Y_i=1) &= \frac{e^{\boldsymbol\beta_1 \cdot \mathbf{X}_i}} {~\sum_{0 \leq c \leq K}^{}{e^{\boldsymbol\beta_c \cdot \mathbf{X}_i}}} = \frac{e^{\boldsymbol\beta_1 \cdot \mathbf{X}_i}}{e^{\boldsymbol\beta_0 \cdot \mathbf{X}_i} + e^{\boldsymbol\beta_1 \cdot \mathbf{X}_i}} = \frac{1}{e^{(\boldsymbol\beta_0-\boldsymbol\beta_1) \cdot \mathbf{X}_i} + 1} = \frac{1} {1 +e^{-\boldsymbol\beta_ \cdot \mathbf{X}_i}} \, \\ \end{align}
 
-with $\boldsymbol\beta = - (\boldsymbol\beta_0 - \boldsymbol\beta_1)$. We see that we obtain the same probabilities as in the two-class logistic regression using the sigmoid function. Wikipedia expands a bit more on that.
+% with $\boldsymbol\beta = - (\boldsymbol\beta_0 - \boldsymbol\beta_1)$. We see that we obtain the same probabilities as in the two-class logistic regression using the sigmoid function. Wikipedia expands a bit more on that.
+
 
 
 \section{Binomial Logistic Regression}
