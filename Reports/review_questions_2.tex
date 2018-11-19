@@ -82,7 +82,7 @@ We can calculate $\sigma(\mathbf{w}^T_2\mathbf{x})$ using the normalization cond
 \end{align*}
 If we define $\mathbf{w} = \mathbf{w_1} - \mathbf{w_2}$ we obtain the same form of the sigmoid function, hence the equivalence.
 
-Less formally, we can say that the equivalence of the two forms builds upon the fact that the classes are mutually exclusive, which implies that the sum of the probabilities of an observation to a class must be equal to one.
+Less formally, we can say that the equivalence of the two forms builds upon the fact that the classes are mutually exclusive, which implies that the sum of the probabilities of observing a class must be equal to one.
 
 
 
@@ -137,7 +137,7 @@ We need to have a function that is close to $0$ if the predicted value $\hat{y}^
 \section{Logistic regression cost, cross-entropy, log-likelihood}
 The cross-entropy is a measure of the similarity of two probability distributions over a set of common events. In the case of machine learning, the two compared distributions are the ground truth versus the probability obtained by the model. So we can see the cross entropy as being a more general definition of a cost function. The goal of the model training is, in fact, minimizing the difference between the observed ground truth and the probability distribution obtained from the trained model. In the case of logistic regression, by considering that the number of classes is two and that the sum of the probabilities for both the real distribution and the model distribution must be one, the cross-entropy is equivalent to the cost function by a constant factor of $\frac{1}{m}$. Hence minimizing the cross-entropy is the same as minimizing the cost function.
 
-As for the likelihood, by training a model we are trying to maximize the likelihood of the data under a probabilistic model given by a set of parameters ( or weights ). Given the numerical instability associated to the calculation of products with very low values (probabilities), instead of maximizing the product is it better to maximize the logarithm of the product. By minimizing the negative of the logarithm of the likelihood, for the case of a binary classifier, we obtain exactly the cross-entropy.
+As for the likelihood, by training a model we are trying to maximize the likelihood of the data under a probabilistic model given by a set of parameters ( or weights ). Given the numerical instability associated to the calculation of products with very low values (probabilities), instead of maximizing the product is it better to maximize the logarithm of the product (which is a sum). By minimizing the negative of the logarithm of the likelihood, for the case of a binary classifier, we obtain the cross-entropy.
 
 \section{ROC curve}
 The Receiver Operating Characteristic (ROC) curve is the True Positive Rate (TPR) as a function of the False Positive Rate (FPR). TPR is the probability that $\hat{y}^{(i)}=1$ given $y^{(i)}=1$, and FPR is the probability that $\hat{y}^{(i)}=1$ given $y^{(i)}=0$.
