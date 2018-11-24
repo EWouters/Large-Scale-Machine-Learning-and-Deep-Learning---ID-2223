@@ -5,6 +5,7 @@
 \usepackage{tikz} % Package for drawing
 \usepackage{amsmath}
 \usepackage{hyperref}
+\usepackage{enumitem}
 
 
 \title{Scalable Machine Learning - Review Questions 3}
@@ -18,14 +19,51 @@
 \url{https://id2223kth.github.io/slides/questions3.pdf}
 
 \section{Bagging/Boosting Trees}
-
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{True}: weak learners are fully independent from each others
+    \item \textbf{True}: the results of all the learners are combined, using different techniques (for example the expectation value given the probability of each outcome)
+    \item \textbf{False}: the weak learner at step $t$ is trained on the residuals of the learner at step $t$, hence each learned depends on the outcome of the previous one
+    \item \textbf{True}: In the sense that the final model is a weighted sum all the learners.
+    % https://www.youtube.com/watch?v=sRktKszFmSk
+\end{enumerate}
 \section{Random Forest}
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{True}: it is usually built on a subset of features, although in principle all of them can be used
+    \item \textbf{True and False}: as said above, nothing prevents you to use all features. Although in case of highly dimensional data-sets this should be avoided.
+    \item \textbf{True}: single trainers are always trained on a subset of records
+    \item \textbf{False}: see above answer
+\end{enumerate}
 
 \section{Spark Model}
-
+The parameter \textit{featureSubsetStrategy} gives you the possibility to tune how many features for each weak learner are randomly selected.
+Supported values are:  "all" for all features, "sqrt" the number of features is the square root the total number of features, "log2" the number of features is the base 2 logarithm of the total number of features, "onethird" the number of features is one third of the total number of features, "auto" depending on the number of trees it will set either "all" or "sqrt".
 \section{Entropy}
+If class partitions are pure, it means that all the instances in the partition have the same label value, lets call it $y_k$. Hence the probability $p_i$ of an instance of having value $y_i$ is $\delta_{ik}$ (one if $i=k$ and zero otherwise).
 
+Hence, for $i\ne k$ the terms of the entropy are
+$$
+    p_i log_{2}{(p_i)} = 0 * -\infty = 0
+$$
+while for $i = k$
+$$
+    p_i log_{2}{(p_i)} = 1 log_{2}{(1)} = 1 * 0 = 0
+$$
+So the entropy is
+$$
+    entropy(D) = - \sum_{i}^{m} p_i log_{2}{(p_i)} = 0
+$$
+where $m$ is the total number of classes
 \section{Gini Impurity}
+Gini impurity is defined as
+$$
+    Gini(D) = 1 - \sum_{i}^{m} p_{i}^2
+$$
 
+Again, if class partitions are pure, it means that all the instances in the partition have the same label value $y_k$. Hence the probability $p_i$ of an instance of having value $y_i$ is $\delta_{ik}$ (one if $i=k$ and zero otherwise).
+
+Which yields
+$$
+    Gini(D) = 1 - \sum_{i}^{m} \delta_{ik}^2 = 1 - 1^2 = 0
+$$
 
 \end{document}
