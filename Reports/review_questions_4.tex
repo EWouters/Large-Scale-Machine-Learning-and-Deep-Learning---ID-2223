@@ -1,0 +1,144 @@
+\documentclass[a4paper]{article}
+
+\usepackage{fullpage} % Package to use full page
+\usepackage{parskip} % Package to tweak paragraph skipping
+\usepackage{tikz} % Package for drawing
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{mathtools}
+
+\title{Scalable Machine Learning - Review Questions 4}
+\author{TheBrightSideOfLife: Giorgio Ruffa - Erik Wouters}
+\date{3/12/2018}
+
+\begin{document}
+
+\maketitle
+
+\url{https://id2223kth.github.io/slides/questions4.pdf}
+
+\section{XOR Problem}
+A single layer perceptron can produce only a linear combination of its inputs. This constraint implies that it cannot represent any nonlinear relationship. The output of a XOR operator are not linearly separable, hence the need of a second layer of pereptrons.
+
+By adding a second layer, it is possible to calculate the intersection of two (or more) linear separators obtained by the now hidden layer and correctly classify the XOR outputs.
+
+Adding neurons to the first layer will just increase the number of possible linear separation of the plane, but without a second layer to calculate the intersection they are useless.
+
+\section{Linear activation}
+Being
+$
+\mathbf{h} = f(\mathbf{x}) = \mathbf{W}_1^{T}\mathbf{x}
+$
+the ouput of the hidden layer, and 
+$
+\mathbf{out} = g(\mathbf{h}) = \mathbf{W}_2^{T}\mathbf{h}
+$
+the final output vector of the matrix. We can re-express the output as a composite function:
+\begin{equation}
+    g(\mathbf{h}) = g(f(\mathbf{x}))
+\end{equation}
+and by using the definition of linear activation (or identity activation) we obtain that
+\begin{equation}
+    g(\mathbf{h}) = g(\mathbf{x}) = \mathbf{W}_2^{T}(\mathbf{W}_1^{T}\mathbf{x}) =  \mathbf{W}_2^{T} \mathbf{W}_1^{T}\mathbf{x}
+\end{equation}
+By redefining $\mathbf{W}^{\prime} \coloneqq \mathbf{W}_2^{T} \mathbf{W}_1^{T}$, we obtain
+\begin{equation}
+    g(\mathbf{x}) = \mathbf{W}^{\prime} \mathbf{x}
+\end{equation}
+Hence the output of the network is a linear function of it's input.
+
+\section{Step function}
+The problem of the step function is related to the use of back propagation, which is based on the computation of the gradient. This has fundamentally two problems.
+
+The first one is that the step function gives zero as a result in case of a linear combination of the inputs with the weights to be negatives, and 1 in case they are positives. So changes in the weights only affect the output if the linear combination thresholds the value around 0. In order to correct (learn) the weights, we would prefer that small changes in the weights will imply small changes in the output of the activation function, regardless of their positioning in the scale.
+
+The other one is that the derivative of the step function is indefinite in the origin and always zero otherwise, thus the activation function is not differentiable, which is requirement for gradient descent to be defined mathematically. In addiation to that, by having a null value of the derivative, the update to the weights will be null and the backpropagation will stop, this is the so-called vanishing gradient problem.
+
+
+\section{BackProp}
+\subsection{Forward Pass}
+The first step is to calculate the output values of each neuron. 
+\begin{equation*}
+\begin{split}
+    out_{h1}    &= max(0,net_{h1}) = max(0, w_1 x_1 + w_2 x_2 + b_1)  \\
+                &= max(0,0.15 \times 0.05 + 0.2 \times 0.10 + 0.35) =  0.3775\\
+    out_{h2}    &= max(0,net_{h2}) = max(0, w_3 x_1 + w_4 x_2 + b_1) \\
+                &= max(0,0.25 \times 0.05 + 0.30 \times 0.10 + 0.35) = 0.3925\\
+    out_{o1}    &= max(0,net_{o1}) = max(0, w_5 out_{h1} + w_6 out_{h2} + b_2)\\
+                &= max(0,0.40 \times 0.3775 + 0.45 \times 0.3925 + 0.60) = 0.927625\\
+    out_{o2}    &= max(0,net_{o2}) = max(0, w_7 out_{h1} + w_8 out_{h2} + b_2)\\
+                &= max(0,0.50 \times 0.3775 + 0.55 \times 0.3925 + 0.60) = 1.004625\\
+\end{split}  
+\end{equation*}
+The error is defined as
+\begin{equation}
+    E_{tot} = E_{o1} + E_{o2} = \frac{1}{2}(target_{o1} - out_{o1})^{2} + \frac{1}{2} (target_{o2} - out_{o2})^{2}
+\end{equation}
+\section{Backward Pass}
+Starting with $w_8$, we express the derivative of the error function against $w_8$ as
+\begin{equation}
+    \frac{\partial E_{tot}}{\partial w_8} = \frac{\partial E_{tot}}{\partial out_{o2}} \times \frac{\partial out_{o2}}{\partial net_{o2}} \times \frac{\partial net_{o2}}{\partial w_8}
+\end{equation}
+Note that since we are using ReLu and all the parameters are positive, along with the inputs, the net of each neuron coincides with its output. Hence
+\begin{equation}
+    \frac{\partial out_{o2}}{\partial net_{o2}} = 1
+\end{equation}
+
+We calculate the remaining derivatives
+\begin{equation*}
+\begin{split}
+    \frac{\partial E_{tot}}{\partial out_{o2}} &= -(target_2 - out_{o2})\\
+    \frac{\partial net_{o2}}{\partial w_8} &= out_{h2}
+\end{split}
+\end{equation*}
+which yields
+\begin{equation}
+    \frac{\partial E_{tot}}{\partial w_8} = - (0.99 - 1.004625) \times 1 \times 0.3925 = 0.0057403
+\end{equation}
+using a learning rate $\eta$ equal to $0.5$ we can update the weight
+\begin{equation}
+    w_{8}^{(t+1)} = w_8 - \eta \frac{\partial E_{tot}}{\partial w_8}  =  0.55 - 0.5 \times 0.0057403 = 0.5471298
+\end{equation}
+
+The case of $w_2$ is slightly more complicated, as it contributes to the error of both outputs neurons.
+
+\begin{equation}
+\label{eq:asd}
+    \frac{\partial E_{tot}}{\partial w_2} = \frac{\partial E_{tot}}{\partial out_{h1}} \times \frac{\partial out_{h1}}{\partial net_{h1}} \times \frac{\partial net_{h1}}{\partial w_2}
+\end{equation}
+This contribution is contained in the first term $\partial E_{tot}/\partial out_{h1}$ that we have to expand
+\begin{equation}
+     \frac{\partial E_{tot}}{\partial out_{h1}} = \frac{\partial E_{o1}}{\partial out_{h1}}  + \frac{\partial E_{o2}}{\partial out_{h1}}
+\end{equation}
+where 
+\begin{equation}
+     \frac{\partial E_{tot}}{\partial out_{h1}} = \frac{\partial E_{o1}}{\partial out_{h1}}  + \frac{\partial E_{o2}}{\partial out_{h1}}
+\end{equation}
+keeping on with the derivation process
+\begin{equation*}
+\begin{split}
+     \frac{\partial E_{o1}}{\partial out_{h1}} &= \frac{\partial E_{o1}}{\partial out_{o1}} \times \frac{\partial out_{o1}}{\partial net_{o1}} \times \frac{\partial net_{o1}}{\partial out_{h1}} \\
+     &= -(target_{o1} - out_{o1}) \times 1 \times w_5 \\
+     &= -(0.01 - 0.927625) \times 1 \times 0.40 \\
+     &= 0.36705 \\
+     \frac{\partial E_{o2}}{\partial out_{h1}} &= \frac{\partial E_{o2}}{\partial out_{o2}} \times \frac{\partial out_{o2}}{\partial net_{o2}} \times \frac{\partial net_{o2}}{\partial out_{h1}} \\
+     &= -(target_{o2} - out_{o2}) \times 1 \times w_7 \\
+     &= - (0.99 - 1.004625) \times 
+     1 \times 0.50 \\
+     &= 0.0073125 \\
+     \frac{\partial E_{tot}}{\partial out_{h1}} &= 0.36705 + 0.0073125 = 0.3743625
+\end{split}
+\end{equation*}
+
+We can now solve equation \ref{eq:asd}
+\begin{equation*}
+    \frac{\partial E_{tot}}{\partial w_2} &= 0.3743625 \times 1 \times x_2 \\
+    &= 0.3743625 \times 1 \times 0.1 = 0.3743625
+\end{equation*}
+
+finally
+\begin{equation}
+    w_{2}^{(t+1)} = w_2 - \eta \frac{\partial E_{tot}}{\partial w_2}  =   0.2 − 0.5 \times 0.03743625 = 0.181281875
+\end{equation}
+\end{document}
