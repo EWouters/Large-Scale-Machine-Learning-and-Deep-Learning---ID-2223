@@ -1,0 +1,60 @@
+\documentclass[a4paper]{article}
+
+\usepackage{fullpage} % Package to use full page
+\usepackage{parskip} % Package to tweak paragraph skipping
+\usepackage{tikz} % Package for drawing
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{mathtools}
+
+\title{Scalable Machine Learning - Review Questions 6}
+\author{TheBrightSideOfLife: Giorgio Ruffa - Erik Wouters}
+\date{6/12/2018}
+
+\begin{document}
+
+\maketitle
+
+\url{https://id2223kth.github.io/slides/questions5.pdf}
+
+\section{Weight Initialization}
+The initial parameters need to break symmetry between different units. If two hidden units with the same activation function are connected to the same inputs, then these units must have different initial parameters. If they have the same initial parameters, then a deterministic learning algorithm applied to a deterministic cost and model will constantly update both of these units in the same way \cite[p.~301]{Goodfellow-et-al-2016}.
+
+Using He initialization for this single random value does not change that.
+
+It is possible and common to initialize the biases to be zero, provided that the symmetry of the different units is broken by assigning them a unique random weight.
+
+\section{Activation Functions}
+2. In which cases would you want to use each of the following activation functions: ELU, leaky ReLU (andits variants), ReLU, tanh, logistic, and softmax?
+
+\begin{itemize}
+\item ELU: Is a function that tends to converge faster and produce more accurate results.
+\item leaky ReLU: Is faster in runtime than ELU.
+\item ReLU: Does not suffer from the dying ReLU problem (if an activation will become negative the unit is effectively dropped).
+\item tanh: Is an alternative to Sigmoid function. It stabilizes quicker because it is zero when the input is zero and active both when the activation is positive and negative (symetrically).
+\item logistic: same as sigmoid?
+\item softmax: same as sigmoid?
+\end{itemize}
+
+
+\section{Batch Normalization}
+3. What is batch normalization and why does it work?
+
+Normalizing the input features speeds up training because across a layer all units use the same activation function. If the inputs are scaled much differently the units will respond more to features that have a bigger range. Eventually the training process will scale the input features, but this will slow down the process.
+
+Batch normalization does a similar thing to the activations of each layer. If you look at the network from the last hidden layer to the output layer and apply normalization on the activations of the last hidden layer, it does exactly the same as input normalization. What batchnorm does is scaling the activations of each hidden layer to have a specific mean and variance every time. These two parameters can also be optimized by the training process.
+% However, the gradient decent algorithm is also shifting these outputs around, so it cannot directly apply normalization to the activations of each hidden layer. 
+
+This limits the amount to which updating the parameters in the earlier layers can effect the distribution en later layers, which allows the layers of the network to learn more independently, and thus it speeds up learning of the whole network.
+
+\section{Dropout}
+Dropout switches the units in the hidden layer(s) off each step in training with a probability $p$. Effectively this introduces noise to the network, and therefore it will slow down training. During inference it does not switch any of the units off, so the speed of predictions will be equal to a network without dropout.
+
+\section{Momentum}
+If we set the momentum very close to $1$ the network will be slow to respond to changes in the gradient landscape. It will take many iterations for the effect of previous gradients to dissipate. If the gradient landscape is rough it can be useful to have a momentum close to $1$, but if it is smooth a smaller value will converge to the global minimum faster in the later stages of training.
+
+\bibliography{bibliography}{}
+\bibliographystyle{plain}
+
+\end{document}
