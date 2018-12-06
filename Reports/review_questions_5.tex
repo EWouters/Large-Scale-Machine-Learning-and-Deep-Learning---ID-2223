@@ -8,7 +8,7 @@
 \usepackage{enumitem}
 \usepackage{mathtools}
 
-\title{Scalable Machine Learning - Review Questions 6}
+\title{Scalable Machine Learning - Review Questions 5}
 \author{TheBrightSideOfLife: Giorgio Ruffa - Erik Wouters}
 \date{6/12/2018}
 
@@ -29,27 +29,30 @@ It is possible and common to initialize the biases to be zero, provided that the
 2. In which cases would you want to use each of the following activation functions: ELU, leaky ReLU (andits variants), ReLU, tanh, logistic, and softmax?
 
 \begin{itemize}
-\item ELU: Is a function that tends to converge faster and produce more accurate results.
-\item leaky ReLU: Is faster in runtime than ELU.
-\item ReLU: Does not suffer from the dying ReLU problem (if an activation will become negative the unit is effectively dropped).
-\item tanh: Is an alternative to Sigmoid function. It stabilizes quicker because it is zero when the input is zero and active both when the activation is positive and negative (symetrically).
-\item logistic: same as sigmoid?
-\item softmax: same as sigmoid?
+\item ELU: Is a function that tends to converge faster and produce more accurate results. However, the increased complexity of the function comes at an higher price in term of computational cost. 
+\item leaky ReLU: They converge slower than ELU, but are computationally less expensive.
+\item ReLU: Very fast to compute but they may suffer from the "dying ReLU" problem. ReLU output zero for a negative value of their net. In case during the learning process a large negative bias is learned, there is no way to correct the weights to "re-activate" the unit, as it will not take part to learning, by outputting always the same value (zero) for every input. They introduce an extra hyper-parameter regulating the slope of the negative part of the function.
+\item tanh: Is an alternative to Sigmoid function. It stabilizes quicker because it is zero when the input is zero and active both when the activation is positive and negative (symmetrically).
+\item logistic and softmax: we joined the two activation functions as logistic is a special case of softmax. They are used respectively for binomial and multinomial classification, and are mainly employed in the output layer in case of classification problems. Logistic Sigmoid was commonly used before the introduction of ReLU as the activation of hidden units. They suffer of the same problem of ReLU for large negative nets, but they will output the same value also for large positive nets, making the learning process slower. 
 \end{itemize}
+
+The general rule to follow is:
+\begin{equation}
+    logistic < tanh < ReLU < leaky ReLU  < ELU
+\end{equation}
+But the final decision may depend on the time at disposal and the computational resources at hand.
 
 
 \section{Batch Normalization}
-3. What is batch normalization and why does it work?
-
 Normalizing the input features speeds up training because across a layer all units use the same activation function. If the inputs are scaled much differently the units will respond more to features that have a bigger range. Eventually the training process will scale the input features, but this will slow down the process.
 
 Batch normalization does a similar thing to the activations of each layer. If you look at the network from the last hidden layer to the output layer and apply normalization on the activations of the last hidden layer, it does exactly the same as input normalization. What batchnorm does is scaling the activations of each hidden layer to have a specific mean and variance every time. These two parameters can also be optimized by the training process.
-% However, the gradient decent algorithm is also shifting these outputs around, so it cannot directly apply normalization to the activations of each hidden layer. 
+% However, the gradient decent algorithm is also shifting these activations around, so it cannot directly apply normalization to the activations of each hidden layer. 
 
 This limits the amount to which updating the parameters in the earlier layers can effect the distribution en later layers, which allows the layers of the network to learn more independently, and thus it speeds up learning of the whole network.
 
 \section{Dropout}
-Dropout switches the units in the hidden layer(s) off each step in training with a probability $p$. Effectively this introduces noise to the network, and therefore it will slow down training. During inference it does not switch any of the units off, so the speed of predictions will be equal to a network without dropout.
+Dropout switches the units in the hidden layer(s) off each step in training with a probability $p$. Effectively this introduces noise to the network, and therefore it will slow down training, however it also reduces overfitting the training set. During inference it does not switch any of the units off, so the speed of predictions will be equal to a network without dropout.
 
 \section{Momentum}
 If we set the momentum very close to $1$ the network will be slow to respond to changes in the gradient landscape. It will take many iterations for the effect of previous gradients to dissipate. If the gradient landscape is rough it can be useful to have a momentum close to $1$, but if it is smooth a smaller value will converge to the global minimum faster in the later stages of training.
