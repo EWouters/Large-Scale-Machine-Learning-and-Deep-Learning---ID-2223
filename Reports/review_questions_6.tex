@@ -21,16 +21,36 @@
 \url{https://id2223kth.github.io/slides/questions6.pdf}
 
 \section{CNN Parameters}
-Using \texttt{SAME} padding implies that on the $x$ and $y$ axes there will be a row of zero's added at $x=-1 \cup y=-1$. Also there will be enough zeros added to the other end of $x$ and $y$ such that the middle of the filter can reach the last pixels of $x$ and $y$.
+
+The size of the input and padding strategy does not affect the number of parameters (weights) in the model, as the kernels slide on the image.
+
+If a kernel has dimensions $m * n$ and his input has a depth of $l$ channels, for each kernel we will have $m * n * l$ weights, since we have a $m * n$ different set of weights for each input channel (see \cite{cnntutorial} section "Convolution Demo").
+If each layer has $k$ kernels (which will create $k$ feature maps as an input of the next layer) and we consider one bias term per kernel, we obtain as a total number of parameters for the layer $i$:
+\begin{equation}
+    tot_{i} = (n_{i} * m_{i} * l_{i} + 1) * k_{i} 
+\end{equation}
+
+In our case, we will have
+
+\begin{equation*}
+\begin{split}
+    tot_{1} &= (n_{1} m_{1} l_{1} + 1) k_{1} = (3 \times 3  \times 3 + 1 ) \times 100 = 2800 \\
+    tot_{2} &= (n_{2} m_{2} k_{1} + 1) k_{2} = (3 \times 3  \times 100 + 1 ) \times 200 = 180200  \\
+    tot_{3} &= (n_{3} m_{3} k_{2} + 1) k_{3} = (3 \times 3  \times 200 + 1 ) \times 400 = 720400 \\
+\end{split}    
+\end{equation*}
+hence
+\begin{equation*}
+\begin{split}
+    tot = 2800 + 180200 + 720400 = 903400
+\end{split}    
+\end{equation*}
 
 
-As we are dealing with RGB images the lowest convolutional layer has $200 \times 3 = 1200$ inputs and $400$ outputs. For each of the outputs there is also a bias. The filter size is $3 \times 3$. This makes $(3 \times 3 \times 18000 + 1) \times 400$ parameters for that layer.
-
-NOT SURE, NEEDS TO BE FIXED
 
 
 \section{CNN filter}
-If we apply the filter in the on the right of figure \ref{fig:q2} to the image on the left using a stride of $2$ in both the $x$ and $y$ directions we get the filtered image in \ref{mat:ans}.
+If we apply the filter on the right of figure \ref{fig:q2} to the image on the left using a stride of $2$ in both the $x$ and $y$ directions we get the filtered image in \ref{mat:ans}.
 
 \begin{figure}[ht]
   \centering
@@ -47,6 +67,7 @@ If we apply the filter in the on the right of figure \ref{fig:q2} to the image o
  \end{bmatrix}
  \label{mat:ans}
 \end{align}
+Note that the normalization factor may be omitted in case of deep learning applications.
 
 The following Python code snipped can be used to compute the result of the filter:
 
@@ -69,9 +90,12 @@ def cf(im, filt, stride=1):
 
 
 \section{Accuracy}
-The correct answer is (c). When the number of kernels increases above a certain limit (which depends on the variance of the input image) the correlation between the kernels starts to increase. This does indeed help the model to overfit the data.
+It is not clear to us what does "correlation between kernels" means, as kernels in the same layer are independent between each others. Nevertheless, as shown in the first question, the number of parameters in mainly influenced by the number of kernels, so this increase in number of kernels makes the number of parameters explode, giving rise to overfitting. We are more incline to consider answer (\textit{c}) to be the correct one. Another possible explanation is that if the number of kernels is high compared to the variance of the input image, they may converge to similar values during training, hence overfit the data.
+% The correct answer is (c). When the number of kernels increases above a certain limit (which depends on the variance of the input image) the correlation between the kernels starts to increase. This does indeed help the model to overfit the data.
 
 % \bibliography{bibliography}{}
 % \bibliographystyle{plain}
+\bibliography{bibliography}{}
+\bibliographystyle{plain}
 
 \end{document}
