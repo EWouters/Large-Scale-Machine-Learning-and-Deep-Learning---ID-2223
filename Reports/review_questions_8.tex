@@ -25,7 +25,7 @@ In this case the model did not learn from the data. The auto-encoder should lear
 In Gibbs samplin we use step 1-6 of RMB.
 
 \section{Generative Model}
-Slides.
+A generative model is a model which is capable of creating new instances that look like they are sampled from the training dataset. They may be used for synthetic data creation or, more commonly, for data augmentation. They are also designed with an encoder-decoder structure, but instead of producing a precise coding for each input instance, they produce a mean and a standard deviation of the coding, that will define a gaussian destribution from which generated data are sampled. An example of generative autoencoders are variational autoencoders. 
 
 \section{Stacked Autoencoder}
 In a symmetric architecture the weights of the encoder layers can be tied to the layers of the decoder layers. This is achieved by setting the decoder weights to the transpose of the encoder weights.

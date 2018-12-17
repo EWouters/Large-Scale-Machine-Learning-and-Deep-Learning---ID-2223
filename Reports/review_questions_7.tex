@@ -20,16 +20,64 @@
 
 \section{RNN for language modeling} %Erik
 
-\section{Vanishing problem} %Erik
+Non-Recurrent Neural Networks require the the data input to be the same size in training, testing and deployment. RNNs however can be used for sequence generation. They use a loop on the current state as an input for the next state. This means that the next word in a sentence can be predicted using all the words that came before it, which is how we can predict the next word in a sentence.
 
-\section{Gates} %Erik/Gio
+\section{Vanishing problem} %Erik
+Because RNNs evaluate each word in a sentence sequentially, the internal state is mostly dependent on the more recent words and words that occurred further back have less influence on the current state. So if relevant data in a sentence appeared further back, the weight of that data is lower. As that gap grows the RNN can become unable to connect the relevant information. This is known as the vanishing problem. There are some solutions for this problem, like long short-term memory (LSTM).
+
+% The weight of each previous word in a sentence is inversely proportional to how far back in the data the word occurred. 
+
+\section{LSTM Gates} %Erik/Gio
+In an LSTM cell there are three gates. These are the forget gate, the input gate and the output gate.
+
+The forget gate computes the sigmoid function over the sum of the weights for the inputs $\mathbf{u}^T_f$ times the input at time step $t$, $\mathbf{x}^{(t)}$, and the weight of the recurrent connection for the forget gate $w_f$ times the previous short term state $h^{(t-1)}$. The result is a vector of values between $0$ (completely forget internal state) and $1$ (completely remember internal state).
+\begin{equation}
+    f^{(t)} = \sigma(\mathbf{u}^T_f\mathbf{x}^{(t)}+w_fh^{(t-1)})
+\end{equation}
+
+The input gate computes the sigmoid function over the sum of the weights for the inputs $\mathbf{u}^T_i$ times the input at time step $t$, $\mathbf{x}^{(t)}$, and the weight of the recurrent connection for the input gate $w_i$ times the previous short term state $h^{(t-1)}$. The result is a vector of values between $0$ (completely forget new input) and $1$ (completely remember new input).
+\begin{equation}
+    i^{(t)} = \sigma(\mathbf{u}^T_i\mathbf{x}^{(t)}+w_ih^{(t-1)})
+\end{equation}
+
+The output gate computes the tanh function over the sum of the weights for the candidate outputs $\mathbf{u}^T_{\tilde{c}}$ times the input at time step $t$, $\mathbf{x}^{(t)}$, and the weight of the recurrent connection for the output gate $w_{\tilde{c}}$ times the previous short term state $h^{(t-1)}$. The result is a vector of values between $-1$ (subtract candidate state) and $1$ (add candidate state).
+\begin{equation}
+    \tilde{c}^{(t)} = \sigma(\mathbf{u}^T_{\tilde{c}}\mathbf{x}^{(t)}+w_{\tilde{c}}h^{(t-1)})
+\end{equation}
+
+The new cell state $c^{(t)}$ is then computed as the sum of the element-wise multiplication between the forget gate vector $f^{(t)}$ and the previous cell state vector $c^{(t-1)}$, and the element-wise multiplication between the input gate vector $i^{(t)}$ and the candidate cell state vector $\tilde{c}^{(t)}$.
+\begin{equation}
+    c^{(t)} = f^{(t)}\odot c^{(t-1)}+i^{(t)}\odot\tilde{c}^{(t)}
+\end{equation}
 
 \section{Gradient descent} %Gio
 We are considering a sequence of two predictions as the error is the sum of the errors at each step. The gradient is the sum of the gradients at each step.
 \begin{equation}
     \frac{\partial E}{\partial u} = \frac{\partial E^{(1)}}{\partial u} + \frac{\partial E^{(2)}}{\partial u}
 \end{equation}
+\begin{equation}
+    \frac{\partial E^{(1)}}{\partial u} = \frac{\partial E^{(1)}}{\partial h_1} \frac{\partial h_1}{\partial u}
+\end{equation}
+\begin{equation}
+    \frac{\partial E^{(2)}}{\partial u} = \frac{\partial E^{(2)}}{\partial h_2} \frac{\partial h_2}{\partial u} + \frac{\partial E^{(2)}}{\partial h_2} \frac{\partial h_2}{\partial h_1} \frac{\partial h_1}{\partial u} 
+\end{equation}
 
+Hence, in a compact form:
+\begin{equation}
+    \frac{\partial E}{\partial u} = \frac{\partial E^{(1)}}{\partial h_1} \frac{\partial h_1}{\partial u} + \frac{\partial E^{(2)}}{\partial h_2} \frac{\partial h_2}{\partial u} + \frac{\partial E^{(2)}}{\partial h_2} \frac{\partial h_2}{\partial h_1} \frac{\partial h_1}{\partial u} 
+\end{equation}
+
+We can further expand $\partial E^{i} / \partial h_i $ considering the target and the activation function derivatives.
+
+\begin{equation}
+    \frac{\partial E^{(i)}}{\partial h_i} = \frac{\partial E^{(i)}}{\partial \hat{y}_i} \frac{\hat{y}_i}{\partial z_i} \frac{z_i}{\partial h_i}
+\end{equation}
+
+So
+\begin{equation}
+    \frac{\partial E}{\partial u} = \frac{\partial E^{(1)}}{\partial \hat{y}_1} \frac{\hat{y}_1}{\partial z_1} \frac{z_1}{\partial h_1}  \frac{\partial h_1}{\partial u} + 
+    \frac{\partial E^{(2)}}{\partial \hat{y}_2} \frac{\hat{y}_2}{\partial z_2} \frac{z_2}{\partial h_2} \frac{\partial h_2}{\partial u} + \frac{\partial E^{(2)}}{\partial \hat{y}_2} \frac{\hat{y}_2}{\partial z_2} \frac{z_2}{\partial h_2} \frac{\partial h_2}{\partial h_1} \frac{\partial h_1}{\partial u} 
+\end{equation}
 
 % \bibliography{bibliography}{}
 % \bibliographystyle{plain}
