@@ -10,7 +10,7 @@
 
 \title{Scalable Machine Learning - Review Questions 8}
 \author{TheBrightSideOfLife: Giorgio Ruffa - Erik Wouters}
-\date{11/12/2018}
+\date{17/12/2018}
 
 \begin{document}
 
@@ -19,18 +19,24 @@
 \url{https://id2223kth.github.io/slides/questions8.pdf}
 
 \section{Autoencoder}
-In this case the model did not learn from the data. The auto-encoder should learn which features from the data are important. If $\mathbf{x}$ is encoded as itself the encoder is useless.
+In this case the model did not learn from the data. The auto-encoder should learn which features from the data are important. In this case
+\begin{equation}
+    \mathbf{y} = f_4(\mathbf{h_3}) = f_4(f_3(f_2(f_1(\mathbf{x})))) = \mathbf{x}
+\end{equation}
+so $\mathbf{x}$ is encoded as itself and the encoder is does nothing.
+
+We can improve the encoder by incrementally reducing the number of units in the hidden layers. This way they are forced to learn what the most important features are.
 
 \section{Gibbs Sampling}
-In Gibbs samplin we use step 1-6 of RMB.
+In Gibbs sampling we use step 1-6 of RMB.
 
 \section{Generative Model}
-A generative model is a model which is capable of creating new instances that look like they are sampled from the training dataset. They may be used for synthetic data creation or, more commonly, for data augmentation. They are also designed with an encoder-decoder structure, but instead of producing a precise coding for each input instance, they produce a mean and a standard deviation of the coding, that will define a gaussian destribution from which generated data are sampled. An example of generative autoencoders are variational autoencoders. 
+A generative model is a model which is capable of creating new instances that look like they are sampled from the training dataset. They may be used for synthetic data creation or, more commonly, for data augmentation. They are also designed with an encoder-decoder structure, but instead of producing a precise coding for each input instance, they produce a mean and a standard deviation of the coding, that will define a Gaussian distribution from which generated data are sampled. An example of generative auto-encoders are Variational auto-encoders. 
 
-\section{Stacked Autoencoder}
+\section{Stacked Auto-encoders}
 In a symmetric architecture the weights of the encoder layers can be tied to the layers of the decoder layers. This is achieved by setting the decoder weights to the transpose of the encoder weights.
 
-Improves training time.
+By doing so the number of weights that have to be optimized is halved and therefore it improves the training time.
 
 
 % \bibliography{bibliography}{}
