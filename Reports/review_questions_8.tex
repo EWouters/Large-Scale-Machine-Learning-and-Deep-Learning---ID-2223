@@ -23,23 +23,47 @@ In this case the model did not learn from the data. The auto-encoder should lear
 \begin{equation}
     \mathbf{y} = f_4(\mathbf{h_3}) = f_4(f_3(f_2(f_1(\mathbf{x})))) = \mathbf{x}
 \end{equation}
-so $\mathbf{x}$ is encoded as itself and the encoder is does nothing.
+so $\mathbf{x}$ is encoded as itself and the encoder does nothing.
 
 We can improve the encoder by incrementally reducing the number of units in the hidden layers. This way they are forced to learn what the most important features are.
 
 \section{Gibbs Sampling}
-In Gibbs sampling we use step 1-6 of RMB.
+In the framework of Restricted Boltzmann Machines (RBM), Gibbs sampling is used as a component of the learning process of the weights connecting the visible and hidden layers.
+
+Keeping in mind that in a RBM the state of a neuron is binary (either 0 or 1),
+Gibbs sampling is divided in the following steps:
+\begin{itemize}
+    \item According to the training example, set the state values $\mathbf{v}$ of the visible layer. 
+    \item The probability $p(\mathbf{h} | \mathbf{v})$ of activation of the hidden neurons is computed. This probability is in form of a sigmoid, and is different from neuron to neuron as it depends on the weights between the hidden and visible layer and the state values of the visible layer.
+    \item The obtained probability is used to calculate the state of the hidden neurons by sampling the Bernoulli distribution, thus defining the new state of $\mathbf{h}$ (which is a binary vector).
+    \item $\mathbf{h}$ is used to compute $p(\mathbf{v} | \mathbf{h})$ using the same mechanism of the steps above.
+    \item $p(\mathbf{v} | \mathbf{h})$ is used to calculate the state of the visible layer, which is the new state $\mathbf{v}\prime$
+\end{itemize}
+The process is repeated $k$ times without change in the weights.
+
+Gibbs sampling is used in conjunction with the so-called "\textit{contrastive divergence}", which is a form of gradient descent where the derivative of the loss function for a given weight $w_{ij}$ is expressed based on the difference of concordant and discordant neurons\footnote{connected by the edge $e_{ij}$ with weight $w_{ij}$} firing before and after the application of Gibbs sampling.
+
+Basically, what Gibbs sampling is doing, is approximating a component of the gradient of the log-likelihood that has to be maximized \footnote{https://theclevermachine.wordpress.com/tag/gibbs-sampling/}.
+
+The question that arises now is: what is the value of $k$? That is, how many iterations of Gibbs sampling are performed before updating the weights?
+
+According to the original paper of the application of RBM to the Netflix challenge\cite{RBMNetflix}: ``\textit{T is typically
+set to one at the beginning of learning and increased
+as the learning converges.  By increasing T
+to a sufficiently large value, it is possible to approximate
+maximum likelihood learning arbitrarily well, but large values
+of T are seldom needed in practice}''. Where in our notation $T$ is $k$.
 
 \section{Generative Model}
 A generative model is a model which is capable of creating new instances that look like they are sampled from the training dataset. They may be used for synthetic data creation or, more commonly, for data augmentation. They are also designed with an encoder-decoder structure, but instead of producing a precise coding for each input instance, they produce a mean and a standard deviation of the coding, that will define a Gaussian distribution from which generated data are sampled. An example of generative auto-encoders are Variational auto-encoders. 
 
 \section{Stacked Auto-encoders}
-In a symmetric architecture the weights of the encoder layers can be tied to the layers of the decoder layers. This is achieved by setting the decoder weights to the transpose of the encoder weights.
+In a symmetric architecture the weights of the encoder layers can be tied to the weights of the decoder layers. This is achieved by setting the decoder weights to the transpose of the encoder weights.
 
 By doing so the number of weights that have to be optimized is halved and therefore it improves the training time.
 
 
-% \bibliography{bibliography}{}
-% \bibliographystyle{plain}
+\bibliography{bibliography}{}
+\bibliographystyle{plain}
 
 \end{document}
